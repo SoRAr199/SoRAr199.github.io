@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <title>番号快速搜索</title>
+  <title>绅士小工具</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -21,37 +21,77 @@
     button {
       cursor: pointer;
       margin-right: 10px;
+      position: relative;
     }
     textarea {
       width: 100%;
       height: 120px;
       margin-top: 10px;
+      resize: vertical;
     }
     .results {
       margin-top: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      justify-content: flex-start;
     }
-    .preview-item {
-      margin-bottom: 20px;
+    .keyword-block {
       background: #333;
       border: 1px solid #999;
       border-radius: 8px;
       padding: 10px;
       box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-      width: fit-content;
-      max-width: 90%;
+      width: calc(33.333% - 12px);
+      min-width: 260px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
     }
-    .preview-item strong {
-      display: block;
-      margin-bottom: 8px;
-      font-size: 14px;
+    .keyword-block strong {
+      font-size: 16px;
       color: #fffa;
     }
-    .preview-item a {
+    .category-block {
+      margin-top: 12px;
+      padding-left: 5px;
+    }
+    .category-block h4 {
+      margin-bottom: 6px;
       color: #ccc;
+      font-weight: 600;
+    }
+    .links-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .links-list a {
+      background: #444;
+      color: #ccc;
+      padding: 6px 10px;
+      border-radius: 5px;
       text-decoration: none;
+      font-size: 14px;
+      white-space: nowrap;
+      user-select: text;
+    }
+    .copy-btn {
+      background-color: #222;
+      border: 1px solid #888;
+      border-radius: 4px;
+      margin-top: 10px;
+      padding: 6px 10px;
+      color: #fff;
+      user-select: none;
+      cursor: pointer;
     }
     .home-buttons {
       margin-bottom: 20px;
+    }
+    .home-buttons h3 {
+      margin: 10px 0 5px;
     }
     .home-buttons button {
       background-color: #222;
@@ -59,14 +99,38 @@
       border: 1px solid #888;
       margin-right: 8px;
       margin-bottom: 8px;
+      padding: 6px 12px;
+      cursor: pointer;
+    }
+    .category-checkboxes label {
+      margin-right: 20px;
+      font-size: 16px;
+      user-select: none;
+      cursor: pointer;
+    }
+    .category-checkboxes input[type="checkbox"] {
+      margin-right: 6px;
+      cursor: pointer;
+    }
+
+    @media (max-width: 960px) {
+      .keyword-block {
+        width: calc(50% - 12px);
+      }
+    }
+    @media (max-width: 600px) {
+      .keyword-block {
+        width: 100%;
+      }
     }
   </style>
 </head>
 <body>
-  <h2>🚀 番号快速搜索</h2>
+  <h2>🎩 绅士小工具</h2>
 
   <div class="home-buttons">
-    <button onclick="window.open('https://missav.live', '_blank')">MissAV</button>
+    <h3>🎬 JAV</h3>
+    <button onclick="window.open('https://missav.live/dm15/cn', '_blank')">MissAV</button>
     <button onclick="window.open('https://www.av01.tv/cn', '_blank')">AV01</button>
     <button onclick="window.open('https://jable.tv', '_blank')">Jable</button>
     <button onclick="window.open('https://netflav5.com', '_blank')">Netflav</button>
@@ -74,71 +138,191 @@
     <button onclick="window.open('https://123av.com/zh', '_blank')">123AV</button>
     <button onclick="window.open('https://24av.net/zh', '_blank')">24AV</button>
     <button onclick="window.open('https://www.av.gl', '_blank')">AV.gl</button>
+    <button onclick="window.open('https://javdb.com', '_blank')">JavDB</button>
+    <button onclick="window.open('https://www.141ppv.com', '_blank')">141PPV</button>
+    <button onclick="window.open('https://www.141jav.com', '_blank')">141JAV</button>
+    <button onclick="window.open('https://fc2hub.com', '_blank')">FC2Hub</button>
+
+    <h3>🍥 Hentai</h3>
+    <button onclick="window.open('https://hanime.tv', '_blank')">hanime.tv</button>
+    <button onclick="window.open('https://hanime1.me', '_blank')">hanime1.me</button>
+    <button onclick="window.open('https://hentai.tv', '_blank')">hentai.tv</button>
+
+    <h3>📚 Manga</h3>
+    <button onclick="window.open('https://nhentai.net', '_blank')">nhentai</button>
+    <button onclick="window.open('https://18comic.vip', '_blank')">18comic</button>
   </div>
 
-  <p>请输入一个或多个番号（如 fc2-ppv-1511145、ddh-087），可换行或空格分隔：</p>
-  <textarea id="input"></textarea>
-  <button onclick="generateLinks()">生成直达链接</button>
+  <div class="category-checkboxes" role="group" aria-label="选择分类">
+    <label><input type="checkbox" id="cat_av" checked> JAV</label>
+    <label><input type="checkbox" id="cat_hentai"> Hentai</label>
+    <label><input type="checkbox" id="cat_manga"> Manga</label>
+  </div>
 
-  <div class="results" id="results"></div>
+  <p>请输入关键词、番号或女优名，可用空格、换行、逗号、顿号等分隔：</p>
+  <textarea id="input" placeholder="示例：ntr, 人妻 jk" autofocus></textarea>
+  <button id="searchBtn" onclick="generateLinks()">生成直达链接</button>
+
+  <div class="results" id="results" aria-live="polite" aria-atomic="true"></div>
 
   <script>
+    const sites = {
+      av: [
+        {name:'FC2Hub', urlFunc:(code,id,isFC2)=> isFC2?`https://fc2hub.com/video/${id}`:null},
+        {name:'141PPV', urlFunc:(code,id,isFC2)=>`https://www.141ppv.com/search/${isFC2 ? 'ppv' + id : id}`},
+        {name:'141JAV', urlFunc:(code,id,isFC2)=> !isFC2 ? `https://www.141jav.com/search/${code.replace(/-/g,'').toLowerCase()}` : null},
+        {name:'JavDB', urlFunc:(code)=>`https://javdb.com/search?q=${encodeURIComponent(code)}`},
+        {name:'MissAV', urlFunc:(code)=>`https://missav.live/dm15/cn/search/${encodeURIComponent(code)}`},
+        {name:'AV01', urlFunc:(code)=>`https://www.av01.tv/cn/search/videos?search_query=${encodeURIComponent(code)}`},
+        {name:'Jable', urlFunc:(code)=>`https://jable.tv/search/${encodeURIComponent(code)}/`},
+        {name:'Netflav', urlFunc:(code)=>`https://netflav5.com/search?type=title&keyword=${encodeURIComponent(code)}`},
+        {name:'EroVideo', urlFunc:(code)=>`https://ero-video.net/?q=${encodeURIComponent(code)}`},
+        {name:'123AV', urlFunc:(code)=>`https://123av.com/zh/search?keyword=${encodeURIComponent(code)}`},
+        {name:'24AV', urlFunc:(code)=>`https://24av.net/zh/search?keyword=${encodeURIComponent(code)}`},
+        {name:'AV.gl', urlFunc:(code)=>`https://www.av.gl/vod/search.html?wd=${encodeURIComponent(code)}`}
+      ],
+      hentai: [
+        {name:'hanime.tv', urlFunc:(code)=>`https://hanime.tv/search?query=${encodeURIComponent(code)}`},
+        {name:'hanime1.me', urlFunc:(code)=>`https://hanime1.me/search?query=${encodeURIComponent(code)}`},
+        {name:'hentai.tv', urlFunc:(code)=>`https://hentai.tv/?s=${encodeURIComponent(code)}`}
+      ],
+      manga: [
+        {name:'nhentai', urlFunc:(code)=>`https://nhentai.net/search/?q=${encodeURIComponent(code)}`},
+        {name:'18comic', urlFunc:(code)=>`https://18comic.vip/search/photos?search_query=${encodeURIComponent(code)}`}
+      ]
+    };
+
     function extractID(code) {
-      const match = code.match(/(\d{4,})$/);
-      return match ? match[1] : null;
+      const m = code.match(/(\d{4,})$/);
+      return m ? m[1] : null;
+    }
+
+    function parseInput(raw) {
+      if (!raw) return [];
+      return raw.split(/[\s,\n、]+/).map(s=>s.trim()).filter(Boolean);
     }
 
     function generateLinks() {
-      const raw = document.getElementById("input").value;
-      const numbers = raw.match(/[a-zA-Z0-9\-]+/g);
+      const raw = document.getElementById("input").value.trim();
+      const entriesRaw = parseInput(raw);
       const container = document.getElementById("results");
-      container.innerHTML = "";
+      container.innerHTML = '';
 
-      if (!numbers || numbers.length === 0) {
-        container.innerHTML = "<p>请输入有效的番号</p>";
+      if (!entriesRaw.length) {
+        container.innerHTML = '<p>请输入有效关键词或番号</p>';
         return;
       }
 
-      numbers.forEach(code => {
-        const id = extractID(code);
-        if (!id) return;
+      const seen = new Set();
+      const entries = [];
+      for(const e of entriesRaw){
+        const low = e.toLowerCase();
+        if(!seen.has(low)){
+          seen.add(low);
+          entries.push(e);
+        }
+      }
 
-        const isFC2 = /^fc2-ppv/i.test(code);
-        const cleanCode = code.replace('-', '').toLowerCase();
+      let cat_av = document.getElementById("cat_av").checked;
+      let cat_hentai = document.getElementById("cat_hentai").checked;
+      let cat_manga = document.getElementById("cat_manga").checked;
 
-        const fc2hub = `https://fc2hub.com/video/${id}`;
-        const jav141ppv = isFC2 ? `https://www.141ppv.com/search/ppv${id}` : `https://www.141ppv.com/search/${id}`;
-        const jav141jav = isFC2 ? null : `https://www.141jav.com/search/${cleanCode}`;
-        const javdb = `https://javdb.com/search?q=${encodeURIComponent(code)}`;
-        const missav = `https://missav.live/cn/search/${encodeURIComponent(code)}`;
-        const av01 = `https://www.av01.tv/cn/search/videos?search_query=${encodeURIComponent(code)}`;
-        const jable = `https://jable.tv/search/${encodeURIComponent(code)}/`;
-        const netflav = `https://netflav5.com/search?type=title&keyword=${encodeURIComponent(code)}`;
-        const ero = `https://ero-video.net/?q=${encodeURIComponent(code)}`;
-        const av123 = `https://123av.com/zh/search?keyword=${encodeURIComponent(code)}`;
-        const av24 = `https://24av.net/zh/search?keyword=${encodeURIComponent(code)}`;
-        const avgl = `https://www.av.gl/vod/search.html?wd=${encodeURIComponent(code)}`;
+      if(!cat_av && !cat_hentai && !cat_manga){
+        cat_av = true; 
+        cat_hentai = true; 
+        cat_manga = true;
+        document.getElementById("cat_av").checked = true;
+        document.getElementById("cat_hentai").checked = true;
+        document.getElementById("cat_manga").checked = true;
+      }
 
-        const block = document.createElement("div");
-        block.className = "preview-item";
-        block.innerHTML = `
-          <strong>${code}</strong>
-          ${isFC2 ? `<div><a href="${fc2hub}" target="_blank">FC2Hub</a></div>` : ''}
-          <div><a href="${jav141ppv}" target="_blank">141PPV 搜索</a></div>
-          ${jav141jav ? `<div><a href="${jav141jav}" target="_blank">141JAV 搜索</a></div>` : ''}
-          <div><a href="${javdb}" target="_blank">JavDB</a></div>
-          <div><a href="${missav}" target="_blank">MissAV</a></div>
-          <div><a href="${av01}" target="_blank">AV01</a></div>
-          <div><a href="${jable}" target="_blank">Jable</a></div>
-          <div><a href="${netflav}" target="_blank">Netflav</a></div>
-          <div><a href="${ero}" target="_blank">EroVideo</a></div>
-          <div><a href="${av123}" target="_blank">123AV</a></div>
-          <div><a href="${av24}" target="_blank">24AV</a></div>
-          <div><a href="${avgl}" target="_blank">AV.gl</a></div>
-        `;
+      entries.forEach(code=>{
+        const block = document.createElement('div');
+        block.className = 'keyword-block';
+
+        const title = document.createElement('strong');
+        title.textContent = `关键词：${code}`;
+        block.appendChild(title);
+
+        if(cat_av){
+          const catBlock = createCategoryBlock('JAV', code, 'av');
+          if(catBlock) block.appendChild(catBlock);
+        }
+        if(cat_hentai){
+          const catBlock = createCategoryBlock('Hentai', code, 'hentai');
+          if(catBlock) block.appendChild(catBlock);
+        }
+        if(cat_manga){
+          const catBlock = createCategoryBlock('Manga', code, 'manga');
+          if(catBlock) block.appendChild(catBlock);
+        }
+
         container.appendChild(block);
       });
     }
+
+    function createCategoryBlock(catName, code, catKey){
+      const sitesArr = sites[catKey];
+      if(!sitesArr || !sitesArr.length) return null;
+
+      const catDiv = document.createElement('div');
+      catDiv.className = 'category-block';
+
+      const header = document.createElement('h4');
+      header.textContent = catName;
+      catDiv.appendChild(header);
+
+      const linksDiv = document.createElement('div');
+      linksDiv.className = 'links-list';
+
+      const id = extractID(code);
+      const isFC2 = /^fc2-ppv/i.test(code);
+
+      let generatedUrls = [];
+
+      sitesArr.forEach(site=>{
+        const url = site.urlFunc(code, id, isFC2);
+        if(url){
+          const a = document.createElement('a');
+          a.href = url;
+          a.target = '_blank';
+          a.rel = "noopener noreferrer";
+          a.textContent = url.replace(/^https?:\/\//,'').split(/[/?#]/)[0];
+          linksDiv.appendChild(a);
+          generatedUrls.push(url);
+        }
+      });
+
+      if(generatedUrls.length === 0){
+        const emptyMsg = document.createElement('p');
+        emptyMsg.style.color = '#999';
+        emptyMsg.textContent = '无相关链接';
+        catDiv.appendChild(emptyMsg);
+        return catDiv;
+      }
+
+      const copyBtn = document.createElement('button');
+      copyBtn.className = 'copy-btn';
+      copyBtn.textContent = `📋 复制【${catName}】所有链接`;
+      copyBtn.onclick = () => {
+        navigator.clipboard.writeText(generatedUrls.join('\n')).then(()=>{
+          alert(`【${catName}】链接已复制到剪贴板`);
+        }).catch(()=>{
+          alert('复制失败，请手动复制');
+        });
+      };
+      catDiv.appendChild(linksDiv);
+      catDiv.appendChild(copyBtn);
+
+      return catDiv;
+    }
+
+    document.getElementById('input').addEventListener('keydown', e=>{
+      if(e.key === 'Enter' && !e.shiftKey){
+        e.preventDefault();
+        generateLinks();
+      }
+    });
   </script>
 </body>
 </html>
