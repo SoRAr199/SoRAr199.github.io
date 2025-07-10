@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>番号快速搜索</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 30px;
+      background-color: #666666;
+      color: #ffffff;
+    }
+    input, button, textarea {
+      padding: 10px;
+      font-size: 16px;
+      background-color: #444;
+      color: #fff;
+      border: 1px solid #999;
+      margin-bottom: 10px;
+    }
+    button {
+      cursor: pointer;
+      margin-right: 10px;
+    }
+    textarea {
+      width: 100%;
+      height: 120px;
+      margin-top: 10px;
+    }
+    .results {
+      margin-top: 20px;
+    }
+    .preview-item {
+      margin-bottom: 20px;
+      background: #333;
+      border: 1px solid #999;
+      border-radius: 8px;
+      padding: 10px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      width: fit-content;
+      max-width: 90%;
+    }
+    .preview-item strong {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: #fffa;
+    }
+    .preview-item a {
+      color: #ccc;
+      text-decoration: none;
+    }
+    .home-buttons {
+      margin-bottom: 20px;
+    }
+    .home-buttons button {
+      background-color: #222;
+      color: #fff;
+      border: 1px solid #888;
+      margin-right: 8px;
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+  <h2>🚀 番号快速搜索</h2>
+
+  <div class="home-buttons">
+    <button onclick="window.open('https://missav.live', '_blank')">MissAV</button>
+    <button onclick="window.open('https://www.av01.tv/cn', '_blank')">AV01</button>
+    <button onclick="window.open('https://jable.tv', '_blank')">Jable</button>
+    <button onclick="window.open('https://netflav5.com', '_blank')">Netflav</button>
+    <button onclick="window.open('https://ero-video.net', '_blank')">EroVideo</button>
+    <button onclick="window.open('https://123av.com/zh', '_blank')">123AV</button>
+    <button onclick="window.open('https://24av.net/zh', '_blank')">24AV</button>
+    <button onclick="window.open('https://www.av.gl', '_blank')">AV.gl</button>
+  </div>
+
+  <p>请输入一个或多个番号（如 fc2-ppv-1511145、ddh-087），可换行或空格分隔：</p>
+  <textarea id="input"></textarea>
+  <button onclick="generateLinks()">生成直达链接</button>
+
+  <div class="results" id="results"></div>
+
+  <script>
+    function extractID(code) {
+      const match = code.match(/(\d{4,})$/);
+      return match ? match[1] : null;
+    }
+
+    function generateLinks() {
+      const raw = document.getElementById("input").value;
+      const numbers = raw.match(/[a-zA-Z0-9\-]+/g);
+      const container = document.getElementById("results");
+      container.innerHTML = "";
+
+      if (!numbers || numbers.length === 0) {
+        container.innerHTML = "<p>请输入有效的番号</p>";
+        return;
+      }
+
+      numbers.forEach(code => {
+        const id = extractID(code);
+        if (!id) return;
+
+        const isFC2 = /^fc2-ppv/i.test(code);
+        const cleanCode = code.replace('-', '').toLowerCase();
+
+        const fc2hub = `https://fc2hub.com/video/${id}`;
+        const jav141ppv = isFC2 ? `https://www.141ppv.com/search/ppv${id}` : `https://www.141ppv.com/search/${id}`;
+        const jav141jav = isFC2 ? null : `https://www.141jav.com/search/${cleanCode}`;
+        const javdb = `https://javdb.com/search?q=${encodeURIComponent(code)}`;
+        const missav = `https://missav.live/cn/search/${encodeURIComponent(code)}`;
+        const av01 = `https://www.av01.tv/cn/search/videos?search_query=${encodeURIComponent(code)}`;
+        const jable = `https://jable.tv/search/${encodeURIComponent(code)}/`;
+        const netflav = `https://netflav5.com/search?type=title&keyword=${encodeURIComponent(code)}`;
+        const ero = `https://ero-video.net/?q=${encodeURIComponent(code)}`;
+        const av123 = `https://123av.com/zh/search?keyword=${encodeURIComponent(code)}`;
+        const av24 = `https://24av.net/zh/search?keyword=${encodeURIComponent(code)}`;
+        const avgl = `https://www.av.gl/vod/search.html?wd=${encodeURIComponent(code)}`;
+
+        const block = document.createElement("div");
+        block.className = "preview-item";
+        block.innerHTML = `
+          <strong>${code}</strong>
+          ${isFC2 ? `<div><a href="${fc2hub}" target="_blank">FC2Hub</a></div>` : ''}
+          <div><a href="${jav141ppv}" target="_blank">141PPV 搜索</a></div>
+          ${jav141jav ? `<div><a href="${jav141jav}" target="_blank">141JAV 搜索</a></div>` : ''}
+          <div><a href="${javdb}" target="_blank">JavDB</a></div>
+          <div><a href="${missav}" target="_blank">MissAV</a></div>
+          <div><a href="${av01}" target="_blank">AV01</a></div>
+          <div><a href="${jable}" target="_blank">Jable</a></div>
+          <div><a href="${netflav}" target="_blank">Netflav</a></div>
+          <div><a href="${ero}" target="_blank">EroVideo</a></div>
+          <div><a href="${av123}" target="_blank">123AV</a></div>
+          <div><a href="${av24}" target="_blank">24AV</a></div>
+          <div><a href="${avgl}" target="_blank">AV.gl</a></div>
+        `;
+        container.appendChild(block);
+      });
+    }
+  </script>
+</body>
+</html>
